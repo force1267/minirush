@@ -2,7 +2,7 @@ module.exports = ((objects) => {
     var graphic = {};
     graphic.FPS = 0;
     graphic.objects = objects ? objects : [];
-    var cvs = document.getElementById("cvs");
+    var cvs = graphic.cvs = document.getElementById("cvs");
     var ctx = graphic.ctx = cvs.getContext("2d");
 
     graphic.sprite = ((obj) => {
@@ -41,8 +41,10 @@ module.exports = ((objects) => {
     });
 
     return graphic;
-    //exports.TPS
+    //exports.FPS
     //exports.objects
+    //exports.cvs
+    //exports.ctx
     //exports.sprite
     //exports.start
     //exports.stop
