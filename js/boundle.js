@@ -3,39 +3,90 @@ module.exports = (() => {
     var ngn = {};
     var logic = ngn.logic = require("./logic.js");
     var anim = ngn.graphic = require("./graphic.js")(logic.activeObject);
-    var hammer = ngn.hammer = new(require("./hammer.min.js"))(anim.cvs, {});
+    var Hammer = ngn.Hammer = require("./hammer.min.js");
+
+
     anim.cvs.setAttribute("onselectstart", "return false;");
     anim.cvs.setAttribute("oncontextmenu", "return false;");
+
+    /*
+    dbgO = logic.object(1);
+    dbgS = anim.sprite(dbgO);
+    dbgS.draw = function() {
+        anim.ctx.font = "38 arial";
+        for (i in dbgText)
+            anim.ctx.fillText(dbgText[i], 100, i * 25 + 25)
+    }
+    dbgText = [];
+    dbg = function(t) {
+        return dbgText.push(t) - 1;
+    }
+    dbg.clear = function() {
+        dbgText = [];
+    }
+*/
 
     return ngn;
     //exports.logic
     //exports.graphic
-    //exports.hammer
+    //exports.Hammer
 })();
-},{"./graphic.js":3,"./hammer.min.js":4,"./logic.js":6}],2:[function(require,module,exports){
-module.exports = ((ngn) => {
+},{"./graphic.js":4,"./hammer.min.js":5,"./logic.js":7}],2:[function(require,module,exports){
+module.exports = (() => {
     //tests :
-    n = ngn;
+    n = require("./engine.js");
     l = n.logic;
     a = l.object(1);
     a.speed = 1;
     a.width = a.height = 100;
     g = n.graphic;
     s = g.sprite(a);
-    n.hammer.on('tap', function(e) {
-        var mw = document.body.offsetWidth || document.body.clientWidth;
-        if (e.center.x < mw / 2) {
-            a.x -= 100;
-        } else {
-            a.x += 100;
-        }
-    });
+    t = require("./game/touch.js");
+    t.onTap.left = function(e) {
+        a.y += 100;
+    }
+    t.onTap.right = function(e) {
+        a.x += 100;
+    }
+
     l.start();
     g.start();
 
     return {};
-});
-},{}],3:[function(require,module,exports){
+})();
+},{"./engine.js":1,"./game/touch.js":3}],3:[function(require,module,exports){
+module.exports = (() => {
+    var ngn = require("../engine.js");
+    //var hammer = ngn.Hammer(ngn.graphic.cvs, {});
+    var tch = {};
+    var cvs = ngn.graphic.cvs;
+    tch.onTap = { left: (() => {}), right: (() => {}) };
+
+    tch.leftTouch = -1;
+    tch.rightTouch = -1;
+    cvs.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var mw = document.body.offsetWidth || document.body.clientWidth;
+        var ts = e.touches;
+        for (var i = 0; i < ts.length; i++) {
+            if (ts[i].clientX <= mw / 2 && ts[i].identifier != tch.leftTouch) {
+                tch.leftTouch = ts[i].identifier;
+                tch.onTap.left(e);
+            }
+            if (ts[i].clientX > mw / 2 && ts[i].identifier != tch.rightTouch) {
+                tch.rightTouch = ts[i].identifier;
+                tch.onTap.right(e);
+            }
+        }
+
+    });
+    cvs.addEventListener('touchend', function(e) { e.preventDefault(); });
+    cvs.addEventListener('touchmove', function(e) { e.preventDefault(); });
+    return tch;
+    //exports.onTap.left
+    //exports.onTap.right
+})();
+},{"../engine.js":1}],4:[function(require,module,exports){
 module.exports = ((objects) => {
     var graphic = {};
     graphic.FPS = 0;
@@ -87,7 +138,7 @@ module.exports = ((objects) => {
     //exports.start
     //exports.stop
 });
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*! Hammer.JS - v2.0.8 - 2016-04-23
  * http://hammerjs.github.io/
  *
@@ -97,10 +148,9 @@ module.exports = ((objects) => {
 
 module.exports = Hammer;
 
-},{}],5:[function(require,module,exports){
-var ngn = require("./engine.js");
-var game = require("./game.js")(ngn);
-},{"./engine.js":1,"./game.js":2}],6:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+var game = require("./game.js");
+},{"./game.js":2}],7:[function(require,module,exports){
 module.exports = (() => {
     var logic = {};
     logic.TPS = 128;
@@ -167,4 +217,4 @@ module.exports = (() => {
     //exports.start
     //exports.stop
 })();
-},{}]},{},[5]);
+},{}]},{},[6]);
